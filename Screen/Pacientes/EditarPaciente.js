@@ -1,251 +1,115 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, ScrollView } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import {View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, ActivityIndicator} from "react-native";
+import React, {useState} from "react";
+import {useNavigation, useRoute} from "@react-navigation/native";
+import {crearPaciente, editarPaciente} from "../../Src/Services/PacienteService";
 
-const EditarPaciente = ({ route, navigation }) => {
-  // Estados del formulario
-  const [id, setId] = useState('');
-  const [nombre, setNombre] = useState('');
-  const [apellido, setApellido] = useState('');
-  const [fechaNacimiento, setFechaNacimiento] = useState(new Date());
-  const [genero, setGenero] = useState('');
-  const [telefono, setTelefono] = useState('');
-  const [correo, setCorreo] = useState('');
-  const [direccion, setDireccion] = useState('');
-  const [alergias, setAlergias] = useState('');
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [modoEdicion, setModoEdicion] = useState(false);
+export default function EditarPaciente () {
+  const navigation = useNavigation();
+  const route = useRoute();
 
-  // Cargar datos si estamos editando
-  useEffect(() => {
-    if (route.params?.paciente) {
-      const paciente = route.params.paciente;
-      setId(paciente.id);
-      setNombre(paciente.nombre);
-      setApellido(paciente.apellido);
-      setFechaNacimiento(new Date(paciente.fechaNacimiento));
-      setGenero(paciente.genero);
-      setTelefono(paciente.telefono);
-      setCorreo(paciente.correo);
-      setDireccion(paciente.direccion);
-      setAlergias(paciente.alergias);
-      setModoEdicion(true);
+  const paciente = route.params?.paciente;
+
+  const [nombre, setNombre] = useState(paciente.nombre || "");
+  const [edad, setEdad] = useState(paciente.edad || "");
+  const [telefono, setTelefono] = useState(paciente.telefono || "");
+  const [direccion, setDireccion] = useState(paciente.direccion || "");
+  const [loading, setLoading] = useState(false);
+
+  const esEdicion = !!paciente;
+
+  const handleGuardar = async () => {
+        if (!nombre || !edad || !telefono || !direccion) {
+            Alert.alert("Error", "Todos los campos son obligatorios");
+            return;
+        }
+        setLoading(true);
+        try{
+            let  result; 
+            if (esEdicion) {
+                result = await editarPaciente(paciente.id, { nombre, edad, telefono, direccion });
+            } else {
+                result = await crearPaciente({ nombre, edad, telefono, direccion });
+            } 
+            if (result.success) {
+                Alert.alert("Éxito", esEdicion ? "Paciente actualizado" : "Paciente creado");
+                navigation.goBack();
+            } else {
+                Alert.alert("Error", result.message || "Error al guardar al paciente");
+            }        
+        } catch (error) {
+            Alert.alert("Error", "Error al guardar al paciente");
+        } finally {
+            setLoading(false);
+        }
     }
-  }, [route.params?.paciente]);
+    return (
+      <View style={Styles.container}>
+            <Text style={Styles.titulo}>{esEdicion ? "Editar Paciente" : "Crear Paciente"}</Text>
+            <TextInput
+                style={Styles.input}
+                placeholder="Nombre del paciente"
+                value={nombre}
+                onChangeText={setNombre}
+            />
+            <TextInput
+                style={Styles.input}
+                placeholder="Edad del paciente"
+                value={edad}
+                onChangeText={setEdad}
+            />
+            <TextInput
+                style={Styles.input}
+                placeholder="Telefono"
+                value={telefono}
+                keyboardType="numeric"
+                onChangeText={setTelefono}
+            />
+            <TextInput
+                style={Styles.input}
+                placeholder="Dirección"
+                value={direccion}
+                keyboardType="numeric"
+                onChangeText={setDireccion}
+            />
+            <TouchableOpacity
+            style={Styles.boton} onPress={handleGuardar} disabled={loading}>
+                {loading ? (
+                    <ActivityIndicator color="#fff" />
+                ) : (
+                    <Text style={Styles.botonTexto}>{esEdicion ? "Actualizar" : "Crear"}</Text>
+                )}
+            </TouchableOpacity>
+        </View>
+    )
+}
 
-  const handleFechaChange = (event, selectedDate) => {
-    setShowDatePicker(false);
-    if (selectedDate) {
-      setFechaNacimiento(selectedDate);
-    }
-  };
-
-  const validarFormulario = () => {
-    if (!nombre.trim() || !apellido.trim()) {
-      Alert.alert('Error', 'Nombre y apellido son requeridos');
-      return false;
-    }
-    if (!telefono.trim()) {
-      Alert.alert('Error', 'El teléfono es requerido');
-      return false;
-    }
-    return true;
-  };
-
-  const handleGuardar = () => {
-    if (!validarFormulario()) return;
-
-    const paciente = {
-      id: modoEdicion ? id : Date.now().toString(),
-      nombre: nombre.trim(),
-      apellido: apellido.trim(),
-      fechaNacimiento: fechaNacimiento.toISOString(),
-      genero: genero.trim(),
-      telefono: telefono.trim(),
-      correo: correo.trim(),
-      direccion: direccion.trim(),
-      alergias: alergias.trim(),
-      imagen: `https://placehold.co/200x200?text=${nombre.trim().charAt(0)}${apellido.trim().charAt(0)}`
-    };
-
-    console.log('Paciente guardado:', paciente);
-    navigation.goBack();
-  };
-
-  const formatDate = (date) => {
-    return date.toLocaleDateString('es-ES', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    });
-  };
-
-  return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
-      <Text style={styles.titulo}>
-        {modoEdicion ? 'Editar Paciente' : 'Nuevo Paciente'}
-      </Text>
-
-      <View style={styles.row}>
-        <TextInput
-          style={[styles.input, { flex: 1, marginRight: 10 }]}
-          placeholder="Nombre*"
-          value={nombre}
-          onChangeText={setNombre}
-        />
-        <TextInput
-          style={[styles.input, { flex: 1 }]}
-          placeholder="Apellido*"
-          value={apellido}
-          onChangeText={setApellido}
-        />
-      </View>
-
-      <TouchableOpacity 
-        style={styles.input} 
-        onPress={() => setShowDatePicker(true)}
-      >
-        <Text style={styles.dateText}>
-          {formatDate(fechaNacimiento) || 'Fecha de nacimiento'}
-        </Text>
-      </TouchableOpacity>
-      {showDatePicker && (
-        <DateTimePicker
-          value={fechaNacimiento}
-          mode="date"
-          display="default"
-          onChange={handleFechaChange}
-          maximumDate={new Date()}
-        />
-      )}
-
-      <TextInput
-        style={styles.input}
-        placeholder="Género"
-        value={genero}
-        onChangeText={setGenero}
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder="Teléfono*"
-        value={telefono}
-        onChangeText={setTelefono}
-        keyboardType="phone-pad"
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder="Correo electrónico"
-        value={correo}
-        onChangeText={setCorreo}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder="Dirección"
-        value={direccion}
-        onChangeText={setDireccion}
-      />
-
-      <TextInput
-        style={[styles.input, styles.textArea]}
-        placeholder="Alergias conocidas"
-        value={alergias}
-        onChangeText={setAlergias}
-        multiline
-        numberOfLines={3}
-      />
-
-      <TouchableOpacity style={styles.botonGuardar} onPress={handleGuardar}>
-        <Text style={styles.textoBoton}>
-          {modoEdicion ? 'Actualizar Paciente' : 'Registrar Paciente'}
-        </Text>
-      </TouchableOpacity>
-
-      {modoEdicion && (
-        <TouchableOpacity 
-          style={styles.botonEliminar} 
-          onPress={() => {
-            Alert.alert(
-              'Confirmar',
-              '¿Estás seguro de eliminar este paciente?',
-              [
-                { text: 'Cancelar', style: 'cancel' },
-                { text: 'Eliminar', onPress: () => {
-                  console.log('Paciente eliminado ID:', id);
-                  navigation.goBack();
-                }}
-              ]
-            );
-          }}
-        >
-          <Text style={styles.textoBoton}>Eliminar Paciente</Text>
-        </TouchableOpacity>
-      )}
-    </ScrollView>
-  );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff'
-  },
-  scrollContent: {
-    padding: 20,
-    paddingBottom: 40
-  },
-  titulo: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 25,
-    color: '#2c3e50',
-    textAlign: 'center'
-  },
-  row: {
-    flexDirection: 'row',
-    marginBottom: 15
-  },
-  input: {
-    backgroundColor: '#f8f9fa',
-    borderWidth: 1,
-    borderColor: '#e9ecef',
-    borderRadius: 8,
-    padding: 15,
-    marginBottom: 15,
-    fontSize: 16
-  },
-  dateText: {
-    fontSize: 16,
-    color: '#2c3e50'
-  },
-  textArea: {
-    height: 100,
-    textAlignVertical: 'top'
-  },
-  botonGuardar: {
-    backgroundColor: '#6de2b4',
-    padding: 15,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 10,
-    marginBottom: 15
-  },
-  botonEliminar: {
-    backgroundColor: '#dc3545',
-    padding: 15,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 10
-  },
-  textoBoton: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold'
-  }
+const Styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        padding: 20,
+        backgroundColor: "#fff",
+    },
+    titulo: {
+        fontSize: 24,
+        fontWeight: "bold",
+        marginBottom: 20,
+    },
+    input: {
+        height: 40,
+        borderColor: "#ccc",
+        borderWidth: 1,
+        borderRadius: 5,
+        paddingHorizontal: 10,
+        marginBottom: 15,
+    },
+    boton: {
+        backgroundColor: "#007BFF",
+        paddingVertical: 10,
+        borderRadius: 5,
+    },
+    botonTexto: {
+        color: "#fff",
+        textAlign: "center",
+        fontSize: 16,
+    },
 });
-
-export default EditarPaciente;

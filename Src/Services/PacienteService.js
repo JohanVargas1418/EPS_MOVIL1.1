@@ -1,8 +1,8 @@
 import api from "./conexion";
 
-export const listarPacientes = async () => {
+export const listarPasientes = async () => {
     try{
-        const response = await api.get("/listarPacientes");
+        const response = await api.get(`listarPasientes/${id}`);
         return {succes: true, data: response.data}
     } catch (error) {
         console.error(
@@ -16,9 +16,9 @@ export const listarPacientes = async () => {
     }
 }
 
-export const eliminarPaciente = async (id) => {
+export const eliminarPasientes = async (id) => {
     try{
-        await api.delete(`elimiarPaciente/${id}`);
+        await api.delete(`eliminarPasientes/${id}`);
         return {succes: true};
     }catch (error) {
         console.error(
@@ -32,9 +32,9 @@ export const eliminarPaciente = async (id) => {
     }
 }
 
-export const crearPaciente = async (paciente) => {
+export const crearPasientes = async (paciente) => {
     try {
-        const response = await api.post("/crearPacientes", data);
+        const response = await api.post("/crearPasientes", data);
         return {success: true, data: response.data};
     }catch (error) {
         console.error(
@@ -48,9 +48,9 @@ export const crearPaciente = async (paciente) => {
     }
 }
 
-export const editarPaciente = async (id, data) => {
+export const editarPasientes = async (id, data) => {
     try{
-        const response = await api.put(`/editarPaciente/${id}`, data);
+        const response = await api.put(`/editarPasientes/${id}`, data);
         return {success: true, data: response.data};
     }catch (error) {
         console.error(

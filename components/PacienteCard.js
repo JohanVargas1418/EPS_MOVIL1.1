@@ -1,25 +1,25 @@
 import React from "react";
-import { View,Text, StyleSheet, TouchableOpacity, StyleSheet } from "react-native";
+import { View,Text, StyleSheet, TouchableOpacity } from "react-native";
 import {Ionicons} from "@expo/vector-icons"
 
 
 export default function CitaCard({paciente, onEdit, onDelete}) {
     return (
-        <View style={StyleSheet.card}>
-            <View style={StyleSheet.info}>
-                <Text style={StyleSheet.nombre}>{paciente.nombre}</Text>
-                <Text style={StyleSheet.apellido}>{paciente.apellido}</Text>
-                <Text style={StyleSheet.num_documento}>{paciente.num_documento}</Text>
-                <Text style={StyleSheet.tipo_documento}>{paciente.tipo_documento}</Text>
-                <Text style={StyleSheet.genero}>{paciente.genero}</Text>
-                <Text style={StyleSheet.telefono}>{paciente.telefono}</Text>
-                <Text style={StyleSheet.correo}>{paciente.correo}</Text>
+        <View style={Style.card}>
+            <View style={Style.info}>
+                <Text style={Style.nombre}>{paciente.nombre}</Text>
+                <Text style={Style.apellido}>{paciente.apellido}</Text>
+                <Text style={Style.num_documento}>{paciente.num_documento}</Text>
+                <Text style={Style.tipo_documento}>{paciente.tipo_documento}</Text>
+                <Text style={Style.genero}>{paciente.genero}</Text>
+                <Text style={Style.telefono}>{paciente.telefono}</Text>
+                <Text style={Style.correo}>{paciente.correo}</Text>
             </View>
-            <View style={StyleSheet.actions}>
-                <TouchableOpacity onPress={onEdit} style={StyleSheet.iconBtn}>
+            <View style={Style.actions}>
+                <TouchableOpacity onPress={onEdit} style={Style.iconBtn}>
                     <Ionicons name="create-outline" size={24} color="black"/>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={onDelete} style={StyleSheet.iconBtn}>
+                <TouchableOpacity onPress={onDelete} style={Style.iconBtn}>
                     <Ionicons name="create-outline" size={24} color="black"/>
                 </TouchableOpacity>
             </View>
@@ -28,7 +28,7 @@ export default function CitaCard({paciente, onEdit, onDelete}) {
 }
 
 
-const StyleSheet = StyleSheet.create({
+const Style = StyleSheet.create({
     card: {
         backgroundColor: "#fff",
         borderRadius: 8,

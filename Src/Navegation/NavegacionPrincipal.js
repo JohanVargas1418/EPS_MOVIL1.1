@@ -1,5 +1,5 @@
 import React from "react";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons, Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 
 import InicioStack from "./stacks/InicioStack";

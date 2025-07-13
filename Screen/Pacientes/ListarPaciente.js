@@ -2,10 +2,10 @@ import {View, Text, FlatList, Alert, ActivityIndicator, TouchableOpacity, StyleS
 import React, { useState, useEffect } from "react";
 import pacienteCard from "../../components/PacienteCard";
 import { useNavigation } from "@react-navigation/native";
-import { listarPacientes } from "../../Src/Services/PacienteService";
-import { eliminarPaciente } from "../../Src/Services/PacienteService";
+import { listarPasientes } from "../../Src/Services/PacienteService";
+import { eliminarPasientes } from "../../Src/Services/PacienteService";
 
-export default function listarPacientes (){
+export default function Pacientes (){
     const[Pacientes, setPacientes] = useState([]);
     const [loading, setLoading] = useState(true);
     const navigation = useNavigation();
@@ -14,7 +14,7 @@ export default function listarPacientes (){
     const handlePacientes = async () => {
         setLoading(true);
         try {
-            const result = await listarPacientes();
+            const result = await listarPasientes();
             if (result.success) {
                 setPacientes(result.data);
             } else {
@@ -43,7 +43,7 @@ export default function listarPacientes (){
                     style: "destructive",
                     onPress: async () => {
                         try {
-                            const result = await eliminarPaciente(id);
+                            const result = await eliminarPasientes(id);
                             if (result.success) {
                                 handlePacientes();
                             } else {
@@ -77,7 +77,7 @@ export default function listarPacientes (){
     return (
         <View style={{flex: 1}}>
             <FlatList
-            data={pacientes}
+            data={Pacientes}
             keyExtractor={(item) => item.id.toString()}
             renderItem={({ item }) => (
                 <pacienteCard

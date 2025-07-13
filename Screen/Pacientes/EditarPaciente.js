@@ -1,9 +1,9 @@
 import {View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, ActivityIndicator} from "react-native";
 import React, {useState} from "react";
 import {useNavigation, useRoute} from "@react-navigation/native";
-import {crearPaciente, editarPaciente} from "../../Src/Services/PacienteService";
+import {crearPasientes, editarPasientes} from "../../Src/Services/PacienteService";
 
-export default function EditarPaciente () {
+export default function EditarPasiente () {
   const navigation = useNavigation();
   const route = useRoute();
 
@@ -26,9 +26,9 @@ export default function EditarPaciente () {
         try{
             let  result; 
             if (esEdicion) {
-                result = await editarPaciente(paciente.id, { nombre, edad, telefono, direccion });
+                result = await editarPasientes(paciente.id, { nombre, edad, telefono, direccion });
             } else {
-                result = await crearPaciente({ nombre, edad, telefono, direccion });
+                result = await crearPasientes({ nombre, edad, telefono, direccion });
             } 
             if (result.success) {
                 Alert.alert("Éxito", esEdicion ? "Paciente actualizado" : "Paciente creado");

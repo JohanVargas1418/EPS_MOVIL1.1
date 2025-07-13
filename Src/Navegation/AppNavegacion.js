@@ -1,7 +1,7 @@
 import { NavigationContainer } from "@react-navigation/native";
 import AuthNavegacion from "./AuthNavegacion";
 import NavegacionPrincipal from "./NavegacionPrincipal";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useState, useEffect, useRef, use } from "react";
 import { ActivityIndicator, View, StyleSheet, AppState } from "react-native";
 

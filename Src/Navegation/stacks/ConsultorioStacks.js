@@ -12,19 +12,19 @@ const Stack = createStackNavigator();
 export default function ConsultoriosStack() {
     return (
         <Stack.Navigator>
-            {/* Pantalla para listar consultorios */}
+            
             <Stack.Screen 
                 name='listarConsultorios' 
                 component={listarConsultorios} 
                 options={{ title: "Consultorios" }}  
             />
-            {/* Pantalla para editar o crear consultorios */}
+            
             <Stack.Screen 
                 name='editarConsultorios' 
                 component={EditarConsultorios} 
                 options={{ title: "Nuevo/Editar Consultorios" }}  
             />
-            {/* Pantalla para mostrar detalles de un consultorio */}
+            
             <Stack.Screen 
                 name='detalleConsultorios'  
                 component={DetalleConsultorios} 

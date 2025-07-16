@@ -12,19 +12,19 @@ const Stack = createStackNavigator();
 export default function PasientesStack() { 
     return (
         <Stack.Navigator>
-            {/* Pantalla para listar pacientes */}
+            
             <Stack.Screen 
                 name='listarPasientes' 
                 component={ListarPasientes} 
                 options={{ title: "Pasientes" }} 
             />
-            {/* Pantalla para editar o crear pacientes */}
+            
             <Stack.Screen 
                 name='editarPasientes' 
                 component={EditarPasientes} 
                 options={{ title: "Nuevo/Editar Pasientes" }} 
             />
-            {/* Pantalla para mostrar detalles de un paciente */}
+            
             <Stack.Screen 
                 name='DetallePasientes' 
                 component={DetallePasientes} 

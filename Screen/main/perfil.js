@@ -177,13 +177,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   header: {
-    height: '25%', // Altura relativa para el encabezado
+    height: '22%', // Altura relativa para el encabezado
     backgroundColor: '#AFEEEE', // Aguamarina suave (PaleTurquoise) para el desvanecido
-    justifyContent: 'center',
+    justifyContent: '10%',
     alignItems: 'center',
-    paddingTop: 40,
-    borderBottomLeftRadius: 40, // Bordes redondeados más pronunciados
-    borderBottomRightRadius: 40,
+    paddingTop: 30,
+    borderBottomLeftRadius: 3, // Bordes redondeados más pronunciados
+    borderBottomRightRadius: 3,
     shadowColor: '#000', // Sombra del encabezado
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.1,
@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
     elevation: 10,
   },
   logo: {
-    fontSize: 48, // Tamaño de fuente más grande
+    fontSize: 22, // Tamaño de fuente más grande
     fontWeight: 'bold',
     color: '#2F4F4F', // Gris oscuro para un buen contraste
     marginBottom: 10,

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import BottonComponent from "../../components/BottonComponent";
-import {ScrollView,View,Text,TextInput,StyleSheet,Alert,ActivityIndicator,Platform,Dimensions,} from "react-native";
+import {ScrollView,View,Text,TextInput,StyleSheet,Alert,ActivityIndicator,Platform,Dimensions,KeyboardAvoidingView} from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { crearConsultorios, editarConsultorios } from "../../Src/Services/ConsultorioService";
 
@@ -161,13 +161,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#E0FFFF', // Aguamarina claro (LightCyan)
   },
   header: {
-    height: '30%', // Altura relativa para el encabezado
+    height: '22%', // Altura relativa para el encabezado
     backgroundColor: '#AFEEEE', // Aguamarina suave (PaleTurquoise) para el desvanecido
-    justifyContent: 'center',
+    justifyContent: '10%',
     alignItems: 'center',
-    paddingTop: 40,
-    borderBottomLeftRadius: 40, // Bordes redondeados más pronunciados
-    borderBottomRightRadius: 40,
+    paddingTop: 30,
+    borderBottomLeftRadius: 3, // Bordes redondeados más pronunciados
+    borderBottomRightRadius: 3,
     shadowColor: '#000', // Sombra del encabezado
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.1,
@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
     elevation: 10,
   },
   logo: {
-    fontSize: 48, // Tamaño de fuente más grande
+    fontSize: 22, // Tamaño de fuente más grande
     fontWeight: 'bold',
     color: '#2F4F4F', // Gris oscuro para un buen contraste
     marginBottom: 10,

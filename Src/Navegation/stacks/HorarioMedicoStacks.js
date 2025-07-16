@@ -12,19 +12,19 @@ const Stack = createStackNavigator();
 export default function HorarioMedicoStack() {
     return (
         <Stack.Navigator>
-            {/* Pantalla para listar horarios médicos */}
+            
             <Stack.Screen 
                 name='listarHoraMedico' 
                 component={ListarHorarioMedico} 
                 options={{ title: "Horario de los Médicos" }}  
             />
-            {/* Pantalla para editar o crear horarios médicos */}
+            
             <Stack.Screen 
                 name='editarHoraMedico' 
                 component={EditarHorarioMedico} 
                 options={{ title: "Nuevo/Editar Horario de los Médicos" }}  
             />
-            {/* Pantalla para mostrar detalles de un horario médico */}
+            
             <Stack.Screen 
                 name='DetalleHorarioMedico'  
                 component={DetalleHorarioMedico} 

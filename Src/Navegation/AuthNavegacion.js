@@ -9,13 +9,13 @@ const Stack = createNativeStackNavigator();
 export default function AuthNavegacion() {
   return (
     <Stack.Navigator>
-      {/* Pantalla para iniciar sesión */}
+      
       <Stack.Screen
         name="Login" 
         component={PantallaLogin} // Componente que se renderiza
         options={{ title: 'Iniciar Sesión' }} 
       />
-      {/* Pantalla para registro */}
+      
       <Stack.Screen
         name="Registro" 
         component={PantallaRegistro} 

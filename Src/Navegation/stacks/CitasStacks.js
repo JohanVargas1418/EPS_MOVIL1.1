@@ -14,19 +14,19 @@ const Stack = createNativeStackNavigator();
 export default function CitasStack() {
     return (
         <Stack.Navigator>
-            {/* Pantalla para listar citas */}
+            
             <Stack.Screen 
                 name="listarCitas" 
                 component={ListarCitas} 
                 options={{ title: "Citas" }} 
             />
-            {/* Pantalla para editar o crear citas */}
+            
             <Stack.Screen 
                 name="editarCitas" 
                 component={EditarCitas} 
                 options={{ title: "Nuevo/Editar Citas" }} 
             />
-            {/* Pantalla para mostrar detalles de una cita */}
+            
             <Stack.Screen 
                 name="DetalleCitas"  
                 component={DetalleCitas} 

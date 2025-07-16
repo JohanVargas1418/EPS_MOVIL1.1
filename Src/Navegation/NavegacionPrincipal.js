@@ -27,7 +27,7 @@ function NavegacionNav() {
                 tabBarStyle: { backgroundColor: "#fff" }, 
             }}
         >
-            {/* Pantalla de inicio */}
+            
             <Tab.Screen 
                 name="Inicio"
                 component={InicioStacks}
@@ -37,7 +37,7 @@ function NavegacionNav() {
                     ),
                 }}
             />
-            {/* Pantalla de perfil */}
+            
             <Tab.Screen
                 name="Perfil"
                 component={Perfil}
@@ -47,7 +47,7 @@ function NavegacionNav() {
                     ),
                 }}
             />
-            {/* Pantalla de configuración */}
+            
             <Tab.Screen
                 name="Configuración"
                 component={Configuración}

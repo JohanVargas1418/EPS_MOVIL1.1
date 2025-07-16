@@ -131,13 +131,13 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between', // Distribuye el espacio verticalmente
     },
     header: {
-        height: '30%', // Altura relativa para el encabezado
+        height: '22%', // Altura relativa para el encabezado
         backgroundColor: '#AFEEEE', // Aguamarina suave (PaleTurquoise) para el desvanecido
         justifyContent: 'center',
         alignItems: 'center',
-        paddingTop: 40,
-        borderBottomLeftRadius: 40, // Bordes redondeados más pronunciados
-        borderBottomRightRadius: 40,
+        paddingTop: 20,
+        borderBottomLeftRadius: 3, // Bordes redondeados más pronunciados
+        borderBottomRightRadius: 3,
         shadowColor: '#000', // Sombra del encabezado
         shadowOffset: { width: 0, height: 10 },
         shadowOpacity: 0.1,
@@ -167,19 +167,19 @@ const styles = StyleSheet.create({
     formContainer: {
         width: '90%',
         paddingHorizontal: 30,
-        paddingTop: 40, // Más padding superior para el formulario
+        paddingTop: 70, // Más padding superior para el formulario
         backgroundColor: '#FFFFFF',
-        borderRadius: 20,
+        borderRadius: 30,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 10 },
         shadowOpacity: 0.2, // Sombra más visible
-        shadowRadius: 20,
-        elevation: 10,
-        marginTop: -60, // Superposición con el encabezado
-        marginBottom: 20,
+        shadowRadius: 30,
+        elevation: 20,
+        marginTop: -70, // Superposición con el encabezado
+        marginBottom: 30,
     },
     inputContainer: {
-        marginBottom: 25, // Más espacio entre inputs
+        marginBottom: 30, // Más espacio entre inputs
     },
     label: {
         color: '#636e72',
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
         letterSpacing: 1,
     },
     footer: {
-        padding: 20,
+        padding: 10,
         borderTopWidth: 1,
         borderTopColor: '#eee',
         justifyContent: 'center',

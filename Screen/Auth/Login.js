@@ -140,13 +140,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#E0FFFF', // Aguamarina muy claro (LightCyan)
   },
   header: {
-    height: '30%',
+    height: '40%',
     backgroundColor: '#AFEEEE', // Aguamarina suave (PaleTurquoise)
-    borderBottomLeftRadius: 40,
-    borderBottomRightRadius: 40,
+    borderBottomLeftRadius: 3,
+    borderBottomRightRadius: 3,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingTop: 40,
+    paddingTop: 30,
     shadowColor: '#000', // Sombra del encabezado
     shadowOffset: { width: 0, height: 8 }, // Sombra más suave
     shadowOpacity: 0.1, // Sombra muy sutil
@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
   wave: {
     position: 'absolute',
     bottom: -20,
-    width: '100%',
+    width: '00%',
     height: 40,
     backgroundColor: '#E0FFFF', // Aguamarina muy claro (para que coincida con el fondo del contenedor)
     borderTopLeftRadius: 40,

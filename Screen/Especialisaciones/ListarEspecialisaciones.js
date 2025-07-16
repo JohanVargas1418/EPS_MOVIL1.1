@@ -1,60 +1,76 @@
 import React, { useEffect, useState } from "react";  
-import { View, Text, Alert, ActivityIndicator, FlatList, StyleSheet, TouchableOpacity, Dimensions } from "react-native";  
-import { useNavigation } from "@react-navigation/native"; 
-import { listarCitas, eliminarCitas } from "../../Src/Services/CitasService";  
-import CitaCard from "../../components/CitasCard"; 
+import { View, Text, Alert, ActivityIndicator, FlatList, StyleSheet, TouchableOpacity, SafeAreaView } from "react-native";  
+import { useNavigation } from "@react-navigation/native";  // Hook para la navegación
+import { listarEspecialidad, eliminarEspecialidad } from "../../Src/Services/EspecialidadesService";  
+import EspecialidadesCard from "../../components/EspecialidadesCard"; 
 
-// Componente principal ListarCitasScreen
-export default function ListarCitasScreen() {
-  const [citas, setCitas] = useState([]);  // Estado para almacenar las citas
+// Componente principal ListarEspecializacionesScreen
+export default function ListarEspecializacionesScreen() {
+  const [especialidades, setEspecialidades] = useState([]);  // Estado para almacenar las especialidades
   const [loading, setLoading] = useState(true);  // Estado para controlar el loading
   const navigation = useNavigation();  // Hook para la navegación
 
-  // Función para cargar las citas
-  const handleCargarCitas = async () => {
+  // Función para cargar las especialidades
+  const handleCargarEspecialidades = async () => {
     setLoading(true);  // Activa el loading
     try {
-      const result = await listarCitas();  
+      const result = await listarEspecialidad();  
       if (result.success) {
-        setCitas(result.data);  // Actualiza el estado con las citas obtenidas
+        setEspecialidades(result.data);  // Actualiza el estado con las especialidades obtenidas
       } else {
-        Alert.alert("Error", result.message || "No se pudieron cargar las citas");
+        Alert.alert("Error", result.message || "No se pudieron cargar las especialidades");
       }
     } catch (error) {
-      Alert.alert("Error", "No se pudieron cargar las citas");
+      Alert.alert("Error", "No se pudieron cargar las especialidades");
     } finally {
       setLoading(false);  // Desactiva el loading
     }
   };
 
-  // Efecto para cargar citas al enfocar la pantalla
+  // Efecto para cargar especialidades al enfocar la pantalla
   useEffect(() => {
-    const unsubscribe = navigation.addListener("focus", handleCargarCitas);
+    const unsubscribe = navigation.addListener("focus", handleCargarEspecialidades);
     return unsubscribe;  // Limpia el listener al desmontar el componente
   }, [navigation]);
 
-  // Función para manejar la eliminación (con restricción)
+  // Función para manejar la eliminación de una especialidad
   const handleEliminar = (id) => {
     Alert.alert(
-      "Acción no permitida",
-      "No tienes permisos para eliminar citas",
+      "Eliminar especialidad",
+      "¿Estás seguro que deseas eliminar esta especialidad?",
       [
-        { text: "Entendido", style: "cancel" }
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Eliminar",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              const result = await eliminarEspecialidad(id);  // Llama al servicio para eliminar la especialidad
+              if (result.success) {
+                handleCargarEspecialidades();  // Recarga las especialidades después de eliminar
+              } else {
+                Alert.alert("Error", result.message || "No se pudo eliminar la especialidad");
+              }
+            } catch (error) {
+              Alert.alert("Error", "No se pudo eliminar la especialidad");
+            }
+          },
+        },
       ]
     );
   };
 
-  // Función para manejar la edición de una cita
-  const handleEditar = (cita) => {
-    navigation.navigate("editarCitas", { cita });  // Navega a la pantalla de edición
+  // Función para manejar la edición de una especialidad
+  const handleEditar = (item) => {
+    navigation.navigate("editarEspecialidad", { especialidades: item });  // Navega a la pantalla de edición
   };
 
-  // Función para manejar la creación de una nueva cita
+  // Función para manejar la creación de una nueva especialidad
   const handleCrear = () => {
-    navigation.navigate("editarCitas");  // Navega a la pantalla de creación
+    navigation.navigate("editarEspecialidad");  // Navega a la pantalla de creación
   };
 
-  // Muestra un indicador de carga mientras se obtienen las citas
+  // Muestra un indicador de carga mientras se obtienen las especialidades
   if (loading) {
     return (
       <View style={styles.centered}>
@@ -63,26 +79,26 @@ export default function ListarCitasScreen() {
     );
   }
 
-  // Renderiza la lista de citas
+  // Renderiza la lista de especialidades
   return (
     <View style={styles.container}>
       {/* Encabezado */}
       <View style={styles.header}>
-        <Text style={styles.logo}>CITAS</Text>
-        <Text style={styles.subtitle}>Tus citas programadas</Text>
+        <Text style={styles.logo}>ESPECIALIDADES</Text>
+        <Text style={styles.subtitle}>Listado de especialidades disponibles</Text>
       </View>
 
       <FlatList
-        data={citas}  // Datos de las citas
+        data={especialidades}  // Datos de las especialidades
         keyExtractor={(item) => item.id.toString()}  // Clave única para cada elemento
         renderItem={({ item }) => (
-          <CitaCard
-            cita={item}  // Pasa la cita al componente CitaCard
+          <EspecialidadesCard
+            especialidades={item}  // Pasa la especialidad al componente EspecialidadesCard
             onEdit={() => handleEditar(item)}  // Maneja la edición
             onDelete={() => handleEliminar(item.id)}  // Maneja la eliminación
           />
         )}
-        ListEmptyComponent={<Text style={styles.empty}>No hay citas registradas</Text>}  // Mensaje si no hay citas
+        ListEmptyComponent={<Text style={styles.empty}>No hay especialidades registradas</Text>}  // Mensaje si no hay especialidades
         contentContainerStyle={styles.flatListContent}  // Estilo para el contenido de la lista
       />
       <TouchableOpacity style={styles.floatingButton} onPress={handleCrear}>

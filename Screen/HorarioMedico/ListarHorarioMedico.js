@@ -1,60 +1,76 @@
 import React, { useEffect, useState } from "react";  
-import { View, Text, Alert, ActivityIndicator, FlatList, StyleSheet, TouchableOpacity, Dimensions } from "react-native";  
-import { useNavigation } from "@react-navigation/native"; 
-import { listarCitas, eliminarCitas } from "../../Src/Services/CitasService";  
-import CitaCard from "../../components/CitasCard"; 
+import { View, Text, Alert, ActivityIndicator, FlatList, StyleSheet, TouchableOpacity, SafeAreaView, Dimensions } from "react-native";  
+import { useNavigation } from "@react-navigation/native";  
+import { listarHoraMedico, eliminarHoraMedico } from "../../Src/Services/HoraMedicaService"; 
+import HoraMedicaCard from "../../components/HorarioMedicoCard";
 
-// Componente principal ListarCitasScreen
-export default function ListarCitasScreen() {
-  const [citas, setCitas] = useState([]);  // Estado para almacenar las citas
+// Componente principal ListarHorarioMedicoScreen
+export default function ListarHorarioMedicoScreen() {
+  const [hora_medico, setHoraMedico] = useState([]);  // Estado para almacenar los horarios médicos
   const [loading, setLoading] = useState(true);  // Estado para controlar el loading
   const navigation = useNavigation();  // Hook para la navegación
 
-  // Función para cargar las citas
-  const handleCargarCitas = async () => {
+  // Función para cargar los horarios médicos
+  const handleCargarHoraMedico = async () => {
     setLoading(true);  // Activa el loading
     try {
-      const result = await listarCitas();  
+      const result = await listarHoraMedico(); 
       if (result.success) {
-        setCitas(result.data);  // Actualiza el estado con las citas obtenidas
+        setHoraMedico(result.data);  // Actualiza el estado con los horarios médicos obtenidos
       } else {
-        Alert.alert("Error", result.message || "No se pudieron cargar las citas");
+        Alert.alert("Error", result.message || "No se pudieron cargar los horarios médicos");
       }
     } catch (error) {
-      Alert.alert("Error", "No se pudieron cargar las citas");
+      Alert.alert("Error", "No se pudieron cargar los horarios médicos");
     } finally {
       setLoading(false);  // Desactiva el loading
     }
   };
 
-  // Efecto para cargar citas al enfocar la pantalla
+  // Efecto para cargar horarios médicos al enfocar la pantalla
   useEffect(() => {
-    const unsubscribe = navigation.addListener("focus", handleCargarCitas);
+    const unsubscribe = navigation.addListener("focus", handleCargarHoraMedico);
     return unsubscribe;  // Limpia el listener al desmontar el componente
   }, [navigation]);
 
-  // Función para manejar la eliminación (con restricción)
+  // Función para manejar la eliminación de un horario médico
   const handleEliminar = (id) => {
     Alert.alert(
-      "Acción no permitida",
-      "No tienes permisos para eliminar citas",
+      "Eliminar horario médico",
+      "¿Estás seguro que deseas eliminar el horario médico?",
       [
-        { text: "Entendido", style: "cancel" }
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Eliminar",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              const result = await eliminarHoraMedico(id);  // Llama al servicio para eliminar el horario médico
+              if (result.success) {
+                handleCargarHoraMedico();  // Recarga los horarios médicos después de eliminar
+              } else {
+                Alert.alert("Error", result.message || "No se pudo eliminar los horarios médicos");
+              }
+            } catch (error) {
+              Alert.alert("Error", "No se pudo eliminar los horarios médicos");
+            }
+          },
+        },
       ]
     );
   };
 
-  // Función para manejar la edición de una cita
-  const handleEditar = (cita) => {
-    navigation.navigate("editarCitas", { cita });  // Navega a la pantalla de edición
+  // Función para manejar la edición de un horario médico
+  const handleEditar = (item) => {
+    navigation.navigate("editarHoraMedico", { hora_medico: item });  // Navega a la pantalla de edición
   };
 
-  // Función para manejar la creación de una nueva cita
+  // Función para manejar la creación de un nuevo horario médico
   const handleCrear = () => {
-    navigation.navigate("editarCitas");  // Navega a la pantalla de creación
+    navigation.navigate("editarHoraMedico");  // Navega a la pantalla de creación
   };
 
-  // Muestra un indicador de carga mientras se obtienen las citas
+  // Muestra un indicador de carga mientras se obtienen los horarios médicos
   if (loading) {
     return (
       <View style={styles.centered}>
@@ -63,26 +79,26 @@ export default function ListarCitasScreen() {
     );
   }
 
-  // Renderiza la lista de citas
+  // Renderiza la lista de horarios médicos
   return (
     <View style={styles.container}>
       {/* Encabezado */}
       <View style={styles.header}>
-        <Text style={styles.logo}>CITAS</Text>
-        <Text style={styles.subtitle}>Tus citas programadas</Text>
+        <Text style={styles.logo}>HORARIOS MÉDICOS</Text>
+        <Text style={styles.subtitle}>Listado de horarios de médicos</Text>
       </View>
 
       <FlatList
-        data={citas}  // Datos de las citas
+        data={hora_medico}  // Datos de los horarios médicos
         keyExtractor={(item) => item.id.toString()}  // Clave única para cada elemento
         renderItem={({ item }) => (
-          <CitaCard
-            cita={item}  // Pasa la cita al componente CitaCard
+          <HoraMedicaCard
+            hora_medico={item}  // Pasa el horario médico al componente HoraMedicaCard
             onEdit={() => handleEditar(item)}  // Maneja la edición
             onDelete={() => handleEliminar(item.id)}  // Maneja la eliminación
           />
         )}
-        ListEmptyComponent={<Text style={styles.empty}>No hay citas registradas</Text>}  // Mensaje si no hay citas
+        ListEmptyComponent={<Text style={styles.empty}>No hay horarios médicos registrados</Text>}  // Mensaje si no hay horarios médicos
         contentContainerStyle={styles.flatListContent}  // Estilo para el contenido de la lista
       />
       <TouchableOpacity style={styles.floatingButton} onPress={handleCrear}>

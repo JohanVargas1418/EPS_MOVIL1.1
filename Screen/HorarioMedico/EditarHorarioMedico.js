@@ -1,33 +1,30 @@
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, ActivityIndicator, Platform, ScrollView, KeyboardAvoidingView, Dimensions } from "react-native";
 import React, { useState } from "react";
-import BottonComponent from "../../components/BottonComponent";
-import {ScrollView,View,Text,TextInput,StyleSheet,Alert,KeyboardAvoidingView,Platform,Dimensions,} from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { crearCitas, editarCitas } from "../../Src/Services/CitasService";
+import { crearHoraMedico, editarHoraMedico } from "../../Src/Services/HoraMedicaService";
 
-export default function EditarCitasScreen() {
+// Componente principal EditarHorarioMedicoScreen
+export default function EditarHorarioMedicoScreen() {
   const navigation = useNavigation();  // Hook para la navegación
   const route = useRoute();  // Hook para acceder a los parámetros de la ruta
 
-  const cita = route.params?.cita;  // Obtiene la cita desde los parámetros de la ruta
+  const hora_medico = route.params?.hora_medico;  // Obtiene el horario del médico desde los parámetros de la ruta
 
   // Estados para los campos del formulario
-  const [idPasientes, setIdPasientes] = useState(cita?.idPasientes?.toString() || "");
-  const [idMedicos, setIdMedicos] = useState(cita?.idMedicos?.toString() || "");
-  const [idConsultorios, setIdConsultorios] = useState(cita?.idConsultorios?.toString() || "");
-  const [fecha, setfecha] = useState(cita?.fecha || "");
-  const [hora, setHora] = useState(cita?.hora || "");
-  const [estado, setEstado] = useState(cita?.estado?.toString() || "");
-  const [motivo, setMotivo] = useState(cita?.motivo?.toString() || "");
-  const [observacion, setObservacion] = useState(cita?.observacion?.toString() || "");
-  const [tipo_consulta, setTipo_consulta] = useState(cita?.tipo_consulta?.toString() || "");
+  const [idMedico, setIdMedico] = useState(hora_medico?.idMedico?.toString() || "");
+  const [dias, setDias] = useState(hora_medico?.dias?.toString() || "");
+  const [fecha_ini, setFecchaIni] = useState(hora_medico?.fecha_ini || "");
+  const [fecha_fin, setFechaFin] = useState(hora_medico?.fecha_fin || "");
+  const [activo, setActivo] = useState(hora_medico?.activo?.toString() || ""); // Asegurar que sea string
+
   const [loading, setLoading] = useState(false);  // Estado para controlar el loading
 
-  const esEdicion = !!cita;  // Determina si es una edición o una nueva cita
+  const esEdicion = !!hora_medico;  // Determina si es una edición o una nueva creación
 
-  // Función para manejar el guardado de la cita
+  // Función para manejar el guardado del horario médico
   const handleGuardar = async () => {
     // Validación de campos obligatorios
-    if (!idPasientes || !idMedicos || !idConsultorios || !fecha || !hora || !estado || !motivo || !observacion || !tipo_consulta) {
+    if (!idMedico || !dias || !fecha_ini || !fecha_fin || !activo) {
       Alert.alert("Error", "Todos los campos son obligatorios");
       return;
     }
@@ -37,30 +34,26 @@ export default function EditarCitasScreen() {
 
       // Llama a la función de editar o crear según corresponda
       if (esEdicion) {
-        result = await editarCitas(cita.id, {
-          idMedicos: parseInt(idMedicos),
-          idPasientes: parseInt(idPasientes),
-          idConsultorios: parseInt(idConsultorios),
-          fecha,
-          hora,
-          estado,
-          motivo,
-          observacion,
-          tipo_consulta
+        result = await editarHoraMedico(hora_medico.id, {
+          idMedico: parseInt(idMedico),
+          dias: parseInt(dias),
+          fecha_ini,
+          fecha_fin,
+          activo,
         });
       } else {
-        result = await crearCitas({ idMedicos, idPasientes, idConsultorios, fecha, hora, estado, motivo, observacion, tipo_consulta });
+        result = await crearHoraMedico({ idMedico, dias, fecha_ini, fecha_fin, activo });
       }
 
       // Manejo de la respuesta
       if (result.success) {
-        Alert.alert("Éxito", esEdicion ? "Cita actualizada" : "Cita creada");
+        Alert.alert("Éxito", esEdicion ? "Horario del médico actualizado" : "Horario del médico creado");
         navigation.goBack();  // Regresa a la pantalla anterior
       } else {
-        Alert.alert("Error", result.message || "Error al guardar la cita");
+        Alert.alert("Error", result.message || "Error al guardar el horario del médico");
       }
     } catch (error) {
-      Alert.alert("Error", "Error al guardar la cita");
+      Alert.alert("Error", "Error al guardar el horario del médico");
     } finally {
       setLoading(false);  // Desactiva el loading
     }
@@ -74,129 +67,88 @@ export default function EditarCitasScreen() {
     >
       {/* Encabezado */}
       <View style={styles.header}>
-        <Text style={styles.logo}>{esEdicion ? "EDITAR CITA" : "NUEVA CITA"}</Text>
-        <Text style={styles.subtitle}>Gestiona los detalles de tu cita</Text>
+        <Text style={styles.logo}>HORARIO MÉDICO</Text> {/* Título principal */}
+        <Text style={styles.subtitle}>
+          {esEdicion ? "Editar horario del médico" : "Crear nuevo horario del médico"}
+        </Text> {/* Subtítulo dinámico */}
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+      >
         <View style={styles.formContainer}>
-          <Text style={styles.formTitle}>{esEdicion ? "Editar Detalles de Cita" : "Crear Nueva Cita"}</Text>
+          <Text style={styles.formTitle}>{esEdicion ? "Formulario de Edición" : "Formulario de Creación"}</Text>
 
+          {/* Campos del formulario */}
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>ID Médico</Text>
+            <Text style={styles.label}>Id Médico</Text>
             <TextInput
               style={styles.input}
-              placeholder="Id del médico"
+              placeholder="Id del Médico"
               placeholderTextColor="#aaa"
+              value={idMedico}
+              onChangeText={setIdMedico}
               keyboardType="numeric"
-              value={idMedicos}
-              onChangeText={setIdMedicos}
             />
             <View style={styles.inputUnderline}></View>
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>ID Paciente</Text>
+            <Text style={styles.label}>Días del Horario Médico</Text>
             <TextInput
               style={styles.input}
-              placeholder="Id del paciente"
+              placeholder="Días del Horario Médico"
               placeholderTextColor="#aaa"
+              value={dias}
+              onChangeText={setDias}
               keyboardType="numeric"
-              value={idPasientes}
-              onChangeText={setIdPasientes}
             />
             <View style={styles.inputUnderline}></View>
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>ID Consultorio</Text>
+            <Text style={styles.label}>Fecha Inicio del Horario Médico</Text>
             <TextInput
               style={styles.input}
-              placeholder="Id del consultorio"
+              placeholder="YYYY-MM-DD"
               placeholderTextColor="#aaa"
-              keyboardType="numeric"
-              value={idConsultorios}
-              onChangeText={setIdConsultorios}
+              value={fecha_ini}
+              onChangeText={setFecchaIni}
+              keyboardType={Platform.OS === "ios" ? "numbers-and-punctuation" : "default"}
+              maxLength={10}
             />
             <View style={styles.inputUnderline}></View>
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Fecha</Text>
+            <Text style={styles.label}>Fecha Fin del Horario Médico</Text>
             <TextInput
               style={styles.input}
-              placeholder="AAAA-MM-DD"
+              placeholder="YYYY-MM-DD"
               placeholderTextColor="#aaa"
-              value={fecha}
-              onChangeText={setfecha}
+              value={fecha_fin}
+              onChangeText={setFechaFin}
+              keyboardType={Platform.OS === "ios" ? "numbers-and-punctuation" : "default"}
+              maxLength={10}
             />
             <View style={styles.inputUnderline}></View>
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Hora</Text>
+            <Text style={styles.label}>Horario médico está activo o no</Text>
             <TextInput
               style={styles.input}
-              placeholder="HH:MM:SS"
+              placeholder="Activo o inactivo"
               placeholderTextColor="#aaa"
-              value={hora}
-              onChangeText={setHora}
-            />
-            <View style={styles.inputUnderline}></View>
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Estado</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Estado de la cita"
-              placeholderTextColor="#aaa"
-              value={estado}
-              onChangeText={setEstado}
-            />
-            <View style={styles.inputUnderline}></View>
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Motivo</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Motivo de la consulta"
-              placeholderTextColor="#aaa"
-              value={motivo}
-              onChangeText={setMotivo}
-            />
-            <View style={styles.inputUnderline}></View>
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Observaciones</Text>
-            <TextInput
-              style={[styles.input, styles.multilineInput]}
-              placeholder="Detalles adicionales"
-              placeholderTextColor="#aaa"
-              value={observacion}
-              onChangeText={setObservacion}
-              multiline
-              numberOfLines={4}
-            />
-            <View style={styles.inputUnderline}></View>
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Tipo de Consulta</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Tipo de consulta"
-              placeholderTextColor="#aaa"
-              value={tipo_consulta}
-              onChangeText={setTipo_consulta}
+              value={activo}
+              onChangeText={setActivo}
             />
             <View style={styles.inputUnderline}></View>
           </View>
 
           <BottonComponent
-            title={loading ? "Guardando..." : "Guardar Cita"}
+            title={loading ? "Guardando..." : "Guardar Horario Médico"}
             onPress={handleGuardar}
             disabled={loading}
           />
@@ -206,6 +158,7 @@ export default function EditarCitasScreen() {
   );
 }
 
+// Estilos del componente
 const styles = StyleSheet.create({
   keyboardAvoidingContainer: {
     flex: 1,

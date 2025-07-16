@@ -1,60 +1,76 @@
 import React, { useEffect, useState } from "react";  
 import { View, Text, Alert, ActivityIndicator, FlatList, StyleSheet, TouchableOpacity, Dimensions } from "react-native";  
-import { useNavigation } from "@react-navigation/native"; 
-import { listarCitas, eliminarCitas } from "../../Src/Services/CitasService";  
-import CitaCard from "../../components/CitasCard"; 
+import { useNavigation } from "@react-navigation/native";  
+import { listarConsultorios, eliminarConsultorios } from "../../Src/Services/ConsultorioService";  
+import ConsultorioCard from "../../components/ConsultorioCard";  
 
-// Componente principal ListarCitasScreen
-export default function ListarCitasScreen() {
-  const [citas, setCitas] = useState([]);  // Estado para almacenar las citas
+// Componente principal ListarConsultoriosScreen
+export default function ListarConsultoriosScreen() {
+  const [consultorio, setConsultorio] = useState([]);  // Estado para almacenar los consultorios
   const [loading, setLoading] = useState(true);  // Estado para controlar el loading
   const navigation = useNavigation();  // Hook para la navegación
 
-  // Función para cargar las citas
-  const handleCargarCitas = async () => {
+  // Función para cargar los consultorios
+  const handleCargarConsultorio = async () => {
     setLoading(true);  // Activa el loading
     try {
-      const result = await listarCitas();  
+      const result = await listarConsultorios(); 
       if (result.success) {
-        setCitas(result.data);  // Actualiza el estado con las citas obtenidas
+        setConsultorio(result.data);  // Actualiza el estado con los consultorios obtenidos
       } else {
-        Alert.alert("Error", result.message || "No se pudieron cargar las citas");
+        Alert.alert("Error", result.message || "No se pudieron cargar los consultorios");
       }
     } catch (error) {
-      Alert.alert("Error", "No se pudieron cargar las citas");
+      Alert.alert("Error", "No se pudieron cargar los consultorios");
     } finally {
       setLoading(false);  // Desactiva el loading
     }
   };
 
-  // Efecto para cargar citas al enfocar la pantalla
+  // Efecto para cargar consultorios al enfocar la pantalla
   useEffect(() => {
-    const unsubscribe = navigation.addListener("focus", handleCargarCitas);
+    const unsubscribe = navigation.addListener("focus", handleCargarConsultorio);
     return unsubscribe;  // Limpia el listener al desmontar el componente
   }, [navigation]);
 
-  // Función para manejar la eliminación (con restricción)
+  // Función para manejar la eliminación de un consultorio
   const handleEliminar = (id) => {
     Alert.alert(
-      "Acción no permitida",
-      "No tienes permisos para eliminar citas",
+      "Eliminar consultorio",
+      "¿Estás seguro que deseas eliminar este consultorio?",
       [
-        { text: "Entendido", style: "cancel" }
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Eliminar",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              const result = await eliminarConsultorios(id);  // Llama al servicio para eliminar el consultorio
+              if (result.success) {
+                handleCargarConsultorio();  // Recarga los consultorios después de eliminar
+              } else {
+                Alert.alert("Error", result.message || "No se pudo eliminar el consultorio");
+              }
+            } catch (error) {
+              Alert.alert("Error", "No se pudo eliminar el consultorio");
+            }
+          },
+        },
       ]
     );
   };
 
-  // Función para manejar la edición de una cita
-  const handleEditar = (cita) => {
-    navigation.navigate("editarCitas", { cita });  // Navega a la pantalla de edición
+  // Función para manejar la edición de un consultorio
+  const handleEditar = (item) => {
+    navigation.navigate("editarConsultorios", { consultorio: item });  // Navega a la pantalla de edición
   };
 
-  // Función para manejar la creación de una nueva cita
+  // Función para manejar la creación de un nuevo consultorio
   const handleCrear = () => {
-    navigation.navigate("editarCitas");  // Navega a la pantalla de creación
+    navigation.navigate("editarConsultorios");  // Navega a la pantalla de creación
   };
 
-  // Muestra un indicador de carga mientras se obtienen las citas
+  // Muestra un indicador de carga mientras se obtienen los consultorios
   if (loading) {
     return (
       <View style={styles.centered}>
@@ -63,26 +79,26 @@ export default function ListarCitasScreen() {
     );
   }
 
-  // Renderiza la lista de citas
+  // Renderiza la lista de consultorios
   return (
     <View style={styles.container}>
       {/* Encabezado */}
       <View style={styles.header}>
-        <Text style={styles.logo}>CITAS</Text>
-        <Text style={styles.subtitle}>Tus citas programadas</Text>
+        <Text style={styles.logo}>CONSULTORIOS</Text>
+        <Text style={styles.subtitle}>Listado de consultorios disponibles</Text>
       </View>
 
       <FlatList
-        data={citas}  // Datos de las citas
+        data={consultorio}  // Datos de los consultorios
         keyExtractor={(item) => item.id.toString()}  // Clave única para cada elemento
         renderItem={({ item }) => (
-          <CitaCard
-            cita={item}  // Pasa la cita al componente CitaCard
+          <ConsultorioCard
+            consultorio={item}  // Pasa el consultorio al componente ConsultorioCard
             onEdit={() => handleEditar(item)}  // Maneja la edición
             onDelete={() => handleEliminar(item.id)}  // Maneja la eliminación
           />
         )}
-        ListEmptyComponent={<Text style={styles.empty}>No hay citas registradas</Text>}  // Mensaje si no hay citas
+        ListEmptyComponent={<Text style={styles.empty}>No hay consultorios registrados</Text>}  // Mensaje si no hay consultorios
         contentContainerStyle={styles.flatListContent}  // Estilo para el contenido de la lista
       />
       <TouchableOpacity style={styles.floatingButton} onPress={handleCrear}>

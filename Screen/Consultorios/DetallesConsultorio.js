@@ -2,136 +2,104 @@ import React, { useState } from "react";
 import BottonComponent from "../../components/BottonComponent";
 import {ScrollView,View,Text,TextInput,StyleSheet,Alert,KeyboardAvoidingView,Platform,Dimensions,} from "react-native";
 
-export default function DetallesCitasScreen({ navigation }) {
-  const [fecha, setFecha] = useState("");
-  const [hora, setHora] = useState("");
-  const [estado, setEstado] = useState("");
-  const [motivo, setMotivo] = useState("");
-  const [observacion, setObservacion] = useState("");
-  const [tipoConsulta, setTipoConsulta] = useState("");
-
-  // Regex para validación de formato (se mantienen)
-  const fechaRegex = /^\d{4}\/\d{2}\/\d{2}$/; 
-  const horaRegex = /^\d{2}:\d{2}$/; 
+export default function DetallesConsultorioScreen() {
+  const [numero, setNumero] = useState("");
+  const [piso, setPiso] = useState("");
+  const [edificio, setEdificio] = useState("");
+  const [descripcion, setDescripcion] = useState("");
+  const [disponible, setDisponible] = useState("");
 
   const handleSubmit = () => {
-    if (!fecha || !hora || !estado || !motivo || !observacion || !tipoConsulta) {
+    if (!numero || !piso || !edificio || !descripcion || !disponible) {
       Alert.alert("Error", "Por favor complete todos los campos.");
-      return;
-    }
-
-    if (!fechaRegex.test(fecha)) {
-      Alert.alert("Formato incorrecto", "Fecha debe tener formato YYYY/MM/DD con barras.");
-      return;
-    }
-
-    if (!horaRegex.test(hora)) {
-      Alert.alert("Formato incorrecto", "Hora debe tener formato HH:MM con dos puntos.");
       return;
     }
 
     Alert.alert(
       "Datos enviados",
-      `Fecha: ${fecha}\nHora: ${hora}\nEstado: ${estado}\nMotivo: ${motivo}\nObservación: ${observacion}\nTipo de consulta: ${tipoConsulta}`
+      `Número: ${numero}\nPiso: ${piso}\nEdificio: ${edificio}\nDescripción: ${descripcion}\nDisponible: ${disponible}`
     );
   };
 
   return (
     <KeyboardAvoidingView
-      style={styles.keyboardAvoidingContainer} // Aplica el estilo del contenedor principal
+      style={styles.keyboardAvoidingContainer}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
       keyboardVerticalOffset={100}
     >
       {/* Encabezado */}
       <View style={styles.header}>
-        <Text style={styles.logo}>CITAS</Text> {/* Título principal */}
-        <Text style={styles.subtitle}>Detalles de tu cita</Text> {/* Subtítulo */}
+        <Text style={styles.logo}>CONSULTORIO</Text> {/* Título principal */}
+        <Text style={styles.subtitle}>Detalles del Consultorio</Text> {/* Subtítulo */}
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.formContainer}> {/* Renombrado de 'card' a 'formContainer' para consistencia */}
-          <Text style={styles.formTitle}>Formulario de Detalles</Text> {/* Título dentro del formulario */}
+          <Text style={styles.formTitle}>Formulario de Consultorio</Text> {/* Título dentro del formulario */}
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Fecha</Text>
+            <Text style={styles.label}>Número</Text>
             <TextInput
               style={styles.input}
-              placeholder="YYYY/MM/DD"
-              placeholderTextColor="#aaa" // Color del placeholder
-              keyboardType={Platform.OS === "ios" ? "numbers-and-punctuation" : "default"}
-              value={fecha}
-              onChangeText={setFecha}
-              maxLength={10}
-              accessibilityLabel="Campo fecha"
+              placeholder="Número del consultorio"
+              placeholderTextColor="#aaa"
+              value={numero}
+              onChangeText={setNumero}
+              accessibilityLabel="Campo número"
             />
             <View style={styles.inputUnderline}></View> {/* Subrayado */}
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Hora</Text>
+            <Text style={styles.label}>Piso</Text>
             <TextInput
               style={styles.input}
-              placeholder="HH:MM"
+              placeholder="Piso del consultorio"
               placeholderTextColor="#aaa"
-              keyboardType={Platform.OS === "ios" ? "numbers-and-punctuation" : "default"}
-              value={hora}
-              onChangeText={setHora}
-              maxLength={5}
-              accessibilityLabel="Campo hora"
+              value={piso}
+              onChangeText={setPiso}
+              accessibilityLabel="Campo piso"
             />
             <View style={styles.inputUnderline}></View>
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Estado</Text>
+            <Text style={styles.label}>Edificio</Text>
             <TextInput
               style={styles.input}
-              placeholder="Estado de su cita"
+              placeholder="Nombre del edificio"
               placeholderTextColor="#aaa"
-              value={estado}
-              onChangeText={setEstado}
-              accessibilityLabel="Campo estado"
+              value={edificio}
+              onChangeText={setEdificio}
+              accessibilityLabel="Campo edificio"
             />
             <View style={styles.inputUnderline}></View>
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Motivo</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Motivo de la cita"
-              placeholderTextColor="#aaa"
-              value={motivo}
-              onChangeText={setMotivo}
-              accessibilityLabel="Campo motivo"
-            />
-            <View style={styles.inputUnderline}></View>
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Observación</Text>
+            <Text style={styles.label}>Descripción</Text>
             <TextInput
               style={[styles.input, styles.multilineInput]}
-              placeholder="Observaciones adicionales"
+              placeholder="Descripción del consultorio"
               placeholderTextColor="#aaa"
-              value={observacion}
-              onChangeText={setObservacion}
+              value={descripcion}
+              onChangeText={setDescripcion}
               multiline
               numberOfLines={4}
-              accessibilityLabel="Campo observación"
+              accessibilityLabel="Campo descripción"
             />
             <View style={styles.inputUnderline}></View>
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Tipo de Consulta</Text>
+            <Text style={styles.label}>Disponible</Text>
             <TextInput
               style={styles.input}
-              placeholder="Tipo de su consulta"
+              placeholder="Estado de disponibilidad"
               placeholderTextColor="#aaa"
-              value={tipoConsulta}
-              onChangeText={setTipoConsulta}
-              accessibilityLabel="Campo tipo de consulta"
+              value={disponible}
+              onChangeText={setDisponible}
+              accessibilityLabel="Campo disponible"
             />
             <View style={styles.inputUnderline}></View>
           </View>
@@ -225,7 +193,9 @@ const styles = StyleSheet.create({
     minHeight: 100,
     textAlignVertical: "top",
   },
-  buttonText: { // Este estilo es para el texto del BottonComponent, si se usa directamente.
+  // El BottonComponent debería manejar su propio estilo de botón y texto.
+  // Estos estilos son solo de referencia si BottonComponent no los provee.
+  buttonText: {
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',

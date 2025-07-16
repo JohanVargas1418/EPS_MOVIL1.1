@@ -1,137 +1,100 @@
 import React, { useState } from "react";
+import { ScrollView, View, Text, StyleSheet, KeyboardAvoidingView, Platform, TextInput, Alert, Dimensions } from "react-native";
 import BottonComponent from "../../components/BottonComponent";
-import {ScrollView,View,Text,TextInput,StyleSheet,Alert,KeyboardAvoidingView,Platform,Dimensions,} from "react-native";
 
-export default function DetallesCitasScreen({ navigation }) {
-  const [fecha, setFecha] = useState("");
-  const [hora, setHora] = useState("");
-  const [estado, setEstado] = useState("");
-  const [motivo, setMotivo] = useState("");
-  const [observacion, setObservacion] = useState("");
-  const [tipoConsulta, setTipoConsulta] = useState("");
+export default function DetallesHorarioMedicoScreen() {
+  const [dias, setDias] = useState(""); // Inicializar con cadena vacía
+  const [fecha_ini, setInicio] = useState(""); // Inicializar con cadena vacía
+  const [fecha_fin, setFinal] = useState(""); // Inicializar con cadena vacía
+  const [activo, setActivo] = useState(""); // Inicializar con cadena vacía
 
-  // Regex para validación de formato (se mantienen)
-  const fechaRegex = /^\d{4}\/\d{2}\/\d{2}$/; 
-  const horaRegex = /^\d{2}:\d{2}$/; 
+  const fechaRegex = /^\d{4}\/\d{2}\/\d{2}$/;
 
   const handleSubmit = () => {
-    if (!fecha || !hora || !estado || !motivo || !observacion || !tipoConsulta) {
+    if (!dias || !fecha_ini || !fecha_fin || !activo) {
       Alert.alert("Error", "Por favor complete todos los campos.");
       return;
     }
 
-    if (!fechaRegex.test(fecha)) {
-      Alert.alert("Formato incorrecto", "Fecha debe tener formato YYYY/MM/DD con barras.");
-      return;
-    }
-
-    if (!horaRegex.test(hora)) {
-      Alert.alert("Formato incorrecto", "Hora debe tener formato HH:MM con dos puntos.");
+    if (!fechaRegex.test(fecha_ini) || !fechaRegex.test(fecha_fin)) { // Validar ambas fechas
+      Alert.alert("Formato incorrecto", "Las fechas deben tener formato YYYY/MM/DD con barras.");
       return;
     }
 
     Alert.alert(
       "Datos enviados",
-      `Fecha: ${fecha}\nHora: ${hora}\nEstado: ${estado}\nMotivo: ${motivo}\nObservación: ${observacion}\nTipo de consulta: ${tipoConsulta}`
+      `Dias: ${dias}\nFecha Inicio: ${fecha_ini}\nFecha Final: ${fecha_fin}\nActivo: ${activo}`
     );
   };
 
   return (
     <KeyboardAvoidingView
-      style={styles.keyboardAvoidingContainer} // Aplica el estilo del contenedor principal
+      style={styles.keyboardAvoidingContainer}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
       keyboardVerticalOffset={100}
     >
       {/* Encabezado */}
       <View style={styles.header}>
-        <Text style={styles.logo}>CITAS</Text> {/* Título principal */}
-        <Text style={styles.subtitle}>Detalles de tu cita</Text> {/* Subtítulo */}
+        <Text style={styles.logo}>HORARIO MÉDICO</Text> {/* Título principal */}
+        <Text style={styles.subtitle}>Gestiona el horario de tu médico</Text> {/* Subtítulo */}
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.formContainer}> {/* Renombrado de 'card' a 'formContainer' para consistencia */}
-          <Text style={styles.formTitle}>Formulario de Detalles</Text> {/* Título dentro del formulario */}
+        <View style={styles.formContainer}>
+          <Text style={styles.formTitle}>Formulario de Horario</Text>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Fecha</Text>
+            <Text style={styles.label}>Días Laborales</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Días laborales del médico"
+              placeholderTextColor="#aaa"
+              value={dias}
+              onChangeText={setDias}
+              accessibilityLabel="Dias"
+            />
+            <View style={styles.inputUnderline}></View>
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Fecha de Inicio Laboral</Text>
             <TextInput
               style={styles.input}
               placeholder="YYYY/MM/DD"
-              placeholderTextColor="#aaa" // Color del placeholder
+              placeholderTextColor="#aaa"
+              value={fecha_ini}
+              onChangeText={setInicio}
+              accessibilityLabel="Fecha de inicio"
               keyboardType={Platform.OS === "ios" ? "numbers-and-punctuation" : "default"}
-              value={fecha}
-              onChangeText={setFecha}
               maxLength={10}
-              accessibilityLabel="Campo fecha"
             />
-            <View style={styles.inputUnderline}></View> {/* Subrayado */}
+            <View style={styles.inputUnderline}></View>
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Hora</Text>
+            <Text style={styles.label}>Fecha Laboral Final</Text>
             <TextInput
               style={styles.input}
-              placeholder="HH:MM"
+              placeholder="YYYY/MM/DD"
               placeholderTextColor="#aaa"
+              value={fecha_fin}
+              onChangeText={setFinal}
+              accessibilityLabel="Fecha de Final"
               keyboardType={Platform.OS === "ios" ? "numbers-and-punctuation" : "default"}
-              value={hora}
-              onChangeText={setHora}
-              maxLength={5}
-              accessibilityLabel="Campo hora"
+              maxLength={10}
             />
             <View style={styles.inputUnderline}></View>
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Estado</Text>
+            <Text style={styles.label}>Horario del médico Activo</Text>
             <TextInput
               style={styles.input}
-              placeholder="Estado de su cita"
+              placeholder="Horario del Medico Activo"
               placeholderTextColor="#aaa"
-              value={estado}
-              onChangeText={setEstado}
-              accessibilityLabel="Campo estado"
-            />
-            <View style={styles.inputUnderline}></View>
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Motivo</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Motivo de la cita"
-              placeholderTextColor="#aaa"
-              value={motivo}
-              onChangeText={setMotivo}
-              accessibilityLabel="Campo motivo"
-            />
-            <View style={styles.inputUnderline}></View>
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Observación</Text>
-            <TextInput
-              style={[styles.input, styles.multilineInput]}
-              placeholder="Observaciones adicionales"
-              placeholderTextColor="#aaa"
-              value={observacion}
-              onChangeText={setObservacion}
-              multiline
-              numberOfLines={4}
-              accessibilityLabel="Campo observación"
-            />
-            <View style={styles.inputUnderline}></View>
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Tipo de Consulta</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Tipo de su consulta"
-              placeholderTextColor="#aaa"
-              value={tipoConsulta}
-              onChangeText={setTipoConsulta}
-              accessibilityLabel="Campo tipo de consulta"
+              value={activo}
+              onChangeText={setActivo}
+              accessibilityLabel="Activo"
             />
             <View style={styles.inputUnderline}></View>
           </View>
@@ -225,7 +188,9 @@ const styles = StyleSheet.create({
     minHeight: 100,
     textAlignVertical: "top",
   },
-  buttonText: { // Este estilo es para el texto del BottonComponent, si se usa directamente.
+  // El BottonComponent debería manejar su propio estilo de botón y texto.
+  // Estos estilos son solo de referencia si BottonComponent no los provee.
+  buttonText: {
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',

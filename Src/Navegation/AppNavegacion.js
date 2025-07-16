@@ -1,68 +1,75 @@
-import { NavigationContainer } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import AuthNavegacion from "./AuthNavegacion";
 import NavegacionPrincipal from "./NavegacionPrincipal";
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, { useState, useEffect, useRef, use } from "react";
-import { ActivityIndicator, View, StyleSheet, AppState } from "react-native";
+import { ActivityIndicator,Text, View, StyleSheet, AppState } from "react-native";
+import React, { useState, useEffect, useRef } from "react"; 
+import { NavigationContainer } from "@react-navigation/native";
 
+// Componente principal AppNavegacion
 export default function AppNavegacion() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [userToken, setUserToken] = useState(null);
-  const appState = useRef(AppState.currentState);
+  const [isLoading, setisLoading] = useState(true); // Estado para manejar la carga
+  const [userToken, setUserToken] = useState(null); // Estado para almacenar el token del usuario
+  const appState = useRef(AppState.currentState); // Referencia al estado actual de la aplicación
 
+  // Función para cargar el token desde AsyncStorage
   const loadToken = async () => {
     try {
-      const token = await AsyncStorage.getItem("userToken");
-      setUserToken(token);
-    } catch (error) {
-      console.error("Error al cargar el token desde AsyncStorage:", error);
+      const token = await AsyncStorage.getItem("userToken"); // Obtiene el token del almacenamiento
+      setUserToken(token); // Actualiza el estado con el token
+    } catch (e) {
+      console.error("Error al cargar el token desde AsyncStorage:", e); 
     } finally {
-      setIsLoading(false);
+      setisLoading(false); // Cambia el estado de carga a falso
     }
   };
+
+  // Efecto para cargar el token al iniciar la aplicación
   useEffect(() => {
-    loadToken(); // Cargar el token al iniciar la aplicación
+    loadToken();
   }, []);
 
+  // Efecto para manejar cambios en el estado de la aplicación
   useEffect(() => {
-    const handleAppStateChange = (nextAppState) => {
+    const handleAppStateChage = (nextAppState) => {
       if (
-        appState.current.match(/inactive|background/) &&
-        nextAppState === "active"
+        appState.current.match(/inactive|background/) &&  nextAppState === "active" // Y si ahora está activa
       ) {
-        console.log(
-          "La aplicación ha vuelto al primer plano, verificando el token..."
-        );
-        loadToken(); // Recargar el token cuando la app vuelve al primer plano
+        console.log("App ha vuelto a estar activa, verificando token..."); 
+        loadToken(); // Verifica el token al volver a la aplicación
       }
-      appState.current = nextAppState;
+      appState.current = nextAppState; // Actualiza el estado de la aplicación
     };
     const subscription = AppState.addEventListener(
-      "change",
-      handleAppStateChange
+      "change", // Escucha cambios en el estado de la aplicación
+      handleAppStateChage // Función que maneja el cambio de estado
     );
-    return () => subscription.remove(); // Limpiar el listener al desmontar el componente
+    return () => subscription?.remove(); // Limpieza de la suscripción al desmontar
   }, []);
 
+  // Efecto para verificar el token cada 2 segundos si la aplicación está activa
   useEffect(() => {
-    if (!isLoading) {
-        const interval = setInterval(() => {
-            if (AppState.currentState === "active") {
-                loadToken(); // Recargar el token si la app está activa
-            }
-        }, 2000);
-      return () => clearInterval(interval); // No renderizar nada mientras se carga el token
+    if (!isLoading) { 
+      const interval = setInterval(() => {
+        if (AppState.currentState === "active") { 
+          loadToken(); // Verifica el token
+        }
+      }, 2000); // Cada 2 segundos
+
+      return () => clearInterval(interval); // Limpieza del intervalo
     }
   }, [isLoading]);
 
-    if (isLoading) {
+  // Muestra un indicador de carga mientras se está cargando
+  if (isLoading) {
     return (
-      <View style={Styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#1da294" />
+      <View style={styles.loadingContainer}> 
+        <ActivityIndicator size="large" color="#1976D2" /> 
       </View>
     );
-    }
+  }
 
+  // Renderiza el contenedor de navegación
+   // Navegación condicional basada en el token
   return (
     <NavigationContainer>
       {userToken ? <NavegacionPrincipal /> : <AuthNavegacion />}
@@ -70,12 +77,11 @@ export default function AppNavegacion() {
   );
 }
 
-
-const Styles = StyleSheet.create({
+// Estilos del componente
+const styles = StyleSheet.create({
   loadingContainer: {
-    flex: 1,
+    flex: 1, 
     justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#1da294",
+    alignItems: "center", 
   },
 });

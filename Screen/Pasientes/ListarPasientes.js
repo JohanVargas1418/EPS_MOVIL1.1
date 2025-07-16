@@ -1,60 +1,76 @@
-import React, { useEffect, useState } from "react";  
-import { View, Text, Alert, ActivityIndicator, FlatList, StyleSheet, TouchableOpacity, Dimensions } from "react-native";  
-import { useNavigation } from "@react-navigation/native"; 
-import { listarCitas, eliminarCitas } from "../../Src/Services/CitasService";  
-import CitaCard from "../../components/CitasCard"; 
+import React, { useEffect, useState } from "react"; 
+import { View, Text, Alert, ActivityIndicator, FlatList, StyleSheet, TouchableOpacity, SafeAreaView, Dimensions } from "react-native";  
+import { useNavigation } from "@react-navigation/native";  
+import { listarPasientes, eliminarPasientes } from "../../Src/Services/PasientesService";  
+import PasientesCard from "../../components/PasientesCard";  
 
-// Componente principal ListarCitasScreen
-export default function ListarCitasScreen() {
-  const [citas, setCitas] = useState([]);  // Estado para almacenar las citas
-  const [loading, setLoading] = useState(true);  // Estado para controlar el loading
+// Componente principal ListarPasientesScreen
+export default function ListarPasientesScreen() {
+  const [pasientes, setPasientes] = useState([]);  // Estado para almacenar la lista de pacientes
+  const [loading, setLoading] = useState(true);  // Estado para manejar la carga
   const navigation = useNavigation();  // Hook para la navegación
 
-  // Función para cargar las citas
-  const handleCargarCitas = async () => {
+  // Función para cargar los pacientes
+  const handleCargarPasientes = async () => {
     setLoading(true);  // Activa el loading
     try {
-      const result = await listarCitas();  
+      const result = await listarPasientes();  
       if (result.success) {
-        setCitas(result.data);  // Actualiza el estado con las citas obtenidas
+        setPasientes(result.data);  // Actualiza el estado con los datos de pacientes
       } else {
-        Alert.alert("Error", result.message || "No se pudieron cargar las citas");
+        Alert.alert("Error", result.message || "No se pudieron cargar los pacientes");
       }
     } catch (error) {
-      Alert.alert("Error", "No se pudieron cargar las citas");
+      Alert.alert("Error", "No se pudieron cargar los pacientes");
     } finally {
-      setLoading(false);  // Desactiva el loading
+      setLoading(false);  // Finaliza la carga
     }
   };
 
-  // Efecto para cargar citas al enfocar la pantalla
+  // Efecto para cargar los pacientes al enfocar la pantalla
   useEffect(() => {
-    const unsubscribe = navigation.addListener("focus", handleCargarCitas);
-    return unsubscribe;  // Limpia el listener al desmontar el componente
+    const unsubscribe = navigation.addListener("focus", handleCargarPasientes);
+    return unsubscribe;  // Limpia el listener al desmontar
   }, [navigation]);
 
-  // Función para manejar la eliminación (con restricción)
+  // Función para eliminar un paciente
   const handleEliminar = (id) => {
     Alert.alert(
-      "Acción no permitida",
-      "No tienes permisos para eliminar citas",
+      "Eliminar paciente",
+      "¿Estás seguro que deseas eliminar este paciente?",
       [
-        { text: "Entendido", style: "cancel" }
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Eliminar",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              const result = await eliminarPasientes(id);  // Llama al servicio para eliminar el paciente
+              if (result.success) {
+                handleCargarPasientes();  // Recarga la lista de pacientes
+              } else {
+                Alert.alert("Error", result.message || "No se pudo eliminar el paciente");
+              }
+            } catch (error) {
+              Alert.alert("Error", "No se pudo eliminar el paciente");
+            }
+          },
+        },
       ]
     );
   };
 
-  // Función para manejar la edición de una cita
-  const handleEditar = (cita) => {
-    navigation.navigate("editarCitas", { cita });  // Navega a la pantalla de edición
+  // Función para editar un paciente
+  const handleEditar = (pasiente) => {
+    navigation.navigate("editarPasientes", { pasientes: pasiente });  // Navega a la pantalla de edición
   };
 
-  // Función para manejar la creación de una nueva cita
+  // Función para crear un nuevo paciente
   const handleCrear = () => {
-    navigation.navigate("editarCitas");  // Navega a la pantalla de creación
+    navigation.navigate("editarPasientes");  // Navega a la pantalla de creación
   };
 
-  // Muestra un indicador de carga mientras se obtienen las citas
+  // Muestra un indicador de carga mientras se cargan los pacientes
   if (loading) {
     return (
       <View style={styles.centered}>
@@ -63,26 +79,26 @@ export default function ListarCitasScreen() {
     );
   }
 
-  // Renderiza la lista de citas
+  // Renderiza la lista de pacientes
   return (
     <View style={styles.container}>
       {/* Encabezado */}
       <View style={styles.header}>
-        <Text style={styles.logo}>CITAS</Text>
-        <Text style={styles.subtitle}>Tus citas programadas</Text>
+        <Text style={styles.logo}>PACIENTES</Text>
+        <Text style={styles.subtitle}>Listado de pacientes registrados</Text>
       </View>
 
       <FlatList
-        data={citas}  // Datos de las citas
+        data={pasientes}  // Datos de los pacientes
         keyExtractor={(item) => item.id.toString()}  // Clave única para cada elemento
         renderItem={({ item }) => (
-          <CitaCard
-            cita={item}  // Pasa la cita al componente CitaCard
+          <PasientesCard
+            pasientes={item}  // Pasa el paciente al componente PasientesCard
             onEdit={() => handleEditar(item)}  // Maneja la edición
             onDelete={() => handleEliminar(item.id)}  // Maneja la eliminación
           />
         )}
-        ListEmptyComponent={<Text style={styles.empty}>No hay citas registradas</Text>}  // Mensaje si no hay citas
+        ListEmptyComponent={<Text style={styles.empty}>No hay pacientes registrados</Text>}  // Mensaje si no hay pacientes
         contentContainerStyle={styles.flatListContent}  // Estilo para el contenido de la lista
       />
       <TouchableOpacity style={styles.floatingButton} onPress={handleCrear}>

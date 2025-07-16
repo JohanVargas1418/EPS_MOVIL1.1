@@ -1,33 +1,32 @@
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, ActivityIndicator, Platform, ScrollView, KeyboardAvoidingView, Dimensions } from "react-native";
 import React, { useState } from "react";
-import BottonComponent from "../../components/BottonComponent";
-import {ScrollView,View,Text,TextInput,StyleSheet,Alert,KeyboardAvoidingView,Platform,Dimensions,} from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { crearCitas, editarCitas } from "../../Src/Services/CitasService";
+import { crearPasientes, editarPasientes } from "../../Src/Services/PasientesService";
+import { Picker } from '@react-native-picker/picker'; // Importa el Picker
 
-export default function EditarCitasScreen() {
+// Componente principal EditarPasientesScreen
+export default function EditarPasientesScreen() {
   const navigation = useNavigation();  // Hook para la navegación
   const route = useRoute();  // Hook para acceder a los parámetros de la ruta
 
-  const cita = route.params?.cita;  // Obtiene la cita desde los parámetros de la ruta
+  const pasientes = route.params?.pasientes;  // Obtiene el paciente a editar desde los parámetros de la ruta
 
   // Estados para los campos del formulario
-  const [idPasientes, setIdPasientes] = useState(cita?.idPasientes?.toString() || "");
-  const [idMedicos, setIdMedicos] = useState(cita?.idMedicos?.toString() || "");
-  const [idConsultorios, setIdConsultorios] = useState(cita?.idConsultorios?.toString() || "");
-  const [fecha, setfecha] = useState(cita?.fecha || "");
-  const [hora, setHora] = useState(cita?.hora || "");
-  const [estado, setEstado] = useState(cita?.estado?.toString() || "");
-  const [motivo, setMotivo] = useState(cita?.motivo?.toString() || "");
-  const [observacion, setObservacion] = useState(cita?.observacion?.toString() || "");
-  const [tipo_consulta, setTipo_consulta] = useState(cita?.tipo_consulta?.toString() || "");
+  const [nombre, setNombre] = useState(pasientes?.nombre?.toString() || "");
+  const [apellido, setApellido] = useState(pasientes?.apellido?.toString() || "");
+  const [num_documento, setNum_documento] = useState(pasientes?.num_documento?.toString() || "");
+  const [tipo_documento, setTipo_documento] = useState(pasientes?.tipo_documento?.toString() || "");
+  const [genero, setGenero] = useState(pasientes?.genero?.toString() || "");
+  const [telefono, setTelefono] = useState(pasientes?.telefono?.toString() || "");
+  const [correo, setCorreo] = useState(pasientes?.correo?.toString() || "");
   const [loading, setLoading] = useState(false);  // Estado para controlar el loading
 
-  const esEdicion = !!cita;  // Determina si es una edición o una nueva cita
+  const esEdicion = !!pasientes;  // Determina si es una edición o una nueva creación
 
-  // Función para manejar el guardado de la cita
+  // Función para manejar el guardado del paciente
   const handleGuardar = async () => {
     // Validación de campos obligatorios
-    if (!idPasientes || !idMedicos || !idConsultorios || !fecha || !hora || !estado || !motivo || !observacion || !tipo_consulta) {
+    if (!nombre || !apellido || !num_documento || !tipo_documento || !genero || !telefono || !correo) {
       Alert.alert("Error", "Todos los campos son obligatorios");
       return;
     }
@@ -37,30 +36,36 @@ export default function EditarCitasScreen() {
 
       // Llama a la función de editar o crear según corresponda
       if (esEdicion) {
-        result = await editarCitas(cita.id, {
-          idMedicos: parseInt(idMedicos),
-          idPasientes: parseInt(idPasientes),
-          idConsultorios: parseInt(idConsultorios),
-          fecha,
-          hora,
-          estado,
-          motivo,
-          observacion,
-          tipo_consulta
+        result = await editarPasientes(pasientes.id, {
+          nombre,
+          apellido,
+          num_documento: parseInt(num_documento),
+          tipo_documento,
+          genero,
+          telefono: parseInt(telefono),
+          correo
         });
       } else {
-        result = await crearCitas({ idMedicos, idPasientes, idConsultorios, fecha, hora, estado, motivo, observacion, tipo_consulta });
+        result = await crearPasientes({ 
+          nombre, 
+          apellido, 
+          num_documento: parseInt(num_documento), 
+          tipo_documento, 
+          genero, 
+          telefono: parseInt(telefono), 
+          correo 
+        });
       }
 
       // Manejo de la respuesta
       if (result.success) {
-        Alert.alert("Éxito", esEdicion ? "Cita actualizada" : "Cita creada");
+        Alert.alert("Éxito", esEdicion ? "Paciente actualizado" : "Paciente creado");
         navigation.goBack();  // Regresa a la pantalla anterior
       } else {
-        Alert.alert("Error", result.message || "Error al guardar la cita");
+        Alert.alert("Error", result.message || "Error al guardar el paciente");
       }
     } catch (error) {
-      Alert.alert("Error", "Error al guardar la cita");
+      Alert.alert("Error", "Error al guardar el paciente");
     } finally {
       setLoading(false);  // Desactiva el loading
     }
@@ -74,129 +79,114 @@ export default function EditarCitasScreen() {
     >
       {/* Encabezado */}
       <View style={styles.header}>
-        <Text style={styles.logo}>{esEdicion ? "EDITAR CITA" : "NUEVA CITA"}</Text>
-        <Text style={styles.subtitle}>Gestiona los detalles de tu cita</Text>
+        <Text style={styles.logo}>PACIENTES</Text> {/* Título principal */}
+        <Text style={styles.subtitle}>
+          {esEdicion ? "Editar detalles del paciente" : "Registrar nuevo paciente"}
+        </Text> {/* Subtítulo dinámico */}
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+      >
         <View style={styles.formContainer}>
-          <Text style={styles.formTitle}>{esEdicion ? "Editar Detalles de Cita" : "Crear Nueva Cita"}</Text>
+          <Text style={styles.formTitle}>{esEdicion ? "Formulario de Edición" : "Formulario de Registro"}</Text>
 
+          {/* Campos del formulario */}
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>ID Médico</Text>
+            <Text style={styles.label}>Nombre del paciente</Text>
             <TextInput
               style={styles.input}
-              placeholder="Id del médico"
+              placeholder="Nombre del paciente"
               placeholderTextColor="#aaa"
+              value={nombre}
+              onChangeText={setNombre}
+            />
+            <View style={styles.inputUnderline}></View>
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Apellido del paciente</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Apellido del paciente"
+              placeholderTextColor="#aaa"
+              value={apellido}
+              onChangeText={setApellido}
+            />
+            <View style={styles.inputUnderline}></View>
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Número de documento</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Número de documento"
+              placeholderTextColor="#aaa"
+              value={num_documento}
+              onChangeText={setNum_documento}
               keyboardType="numeric"
-              value={idMedicos}
-              onChangeText={setIdMedicos}
             />
             <View style={styles.inputUnderline}></View>
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>ID Paciente</Text>
+            <Text style={styles.label}>Tipo de documento</Text>
+            <View style={styles.pickerContainer}>
+              <Picker
+                selectedValue={tipo_documento}
+                style={styles.picker}
+                onValueChange={(itemValue) => setTipo_documento(itemValue)}
+              >
+                <Picker.Item label="Seleccione un tipo de documento" value="" />
+                <Picker.Item label="Cédula" value="Cédula" />
+                <Picker.Item label="Tarjeta" value="Tarjeta" />
+              </Picker>
+            </View>
+            <View style={styles.inputUnderline}></View>
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Género</Text>
             <TextInput
               style={styles.input}
-              placeholder="Id del paciente"
+              placeholder="Género"
               placeholderTextColor="#aaa"
+              value={genero}
+              onChangeText={setGenero}
+            />
+            <View style={styles.inputUnderline}></View>
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Teléfono</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Teléfono"
+              placeholderTextColor="#aaa"
+              value={telefono}
+              onChangeText={setTelefono}
               keyboardType="numeric"
-              value={idPasientes}
-              onChangeText={setIdPasientes}
             />
             <View style={styles.inputUnderline}></View>
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>ID Consultorio</Text>
+            <Text style={styles.label}>Correo electrónico</Text>
             <TextInput
               style={styles.input}
-              placeholder="Id del consultorio"
+              placeholder="Correo electrónico"
               placeholderTextColor="#aaa"
-              keyboardType="numeric"
-              value={idConsultorios}
-              onChangeText={setIdConsultorios}
+              value={correo}
+              onChangeText={setCorreo}
+              keyboardType="email-address"
             />
             <View style={styles.inputUnderline}></View>
           </View>
 
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Fecha</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="AAAA-MM-DD"
-              placeholderTextColor="#aaa"
-              value={fecha}
-              onChangeText={setfecha}
-            />
-            <View style={styles.inputUnderline}></View>
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Hora</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="HH:MM:SS"
-              placeholderTextColor="#aaa"
-              value={hora}
-              onChangeText={setHora}
-            />
-            <View style={styles.inputUnderline}></View>
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Estado</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Estado de la cita"
-              placeholderTextColor="#aaa"
-              value={estado}
-              onChangeText={setEstado}
-            />
-            <View style={styles.inputUnderline}></View>
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Motivo</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Motivo de la consulta"
-              placeholderTextColor="#aaa"
-              value={motivo}
-              onChangeText={setMotivo}
-            />
-            <View style={styles.inputUnderline}></View>
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Observaciones</Text>
-            <TextInput
-              style={[styles.input, styles.multilineInput]}
-              placeholder="Detalles adicionales"
-              placeholderTextColor="#aaa"
-              value={observacion}
-              onChangeText={setObservacion}
-              multiline
-              numberOfLines={4}
-            />
-            <View style={styles.inputUnderline}></View>
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Tipo de Consulta</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Tipo de consulta"
-              placeholderTextColor="#aaa"
-              value={tipo_consulta}
-              onChangeText={setTipo_consulta}
-            />
-            <View style={styles.inputUnderline}></View>
-          </View>
-
-          <BottonComponent
-            title={loading ? "Guardando..." : "Guardar Cita"}
+          {/* Botón para guardar el paciente */}
+          <BotonComponent
+            title={loading ? "Guardando..." : "Guardar paciente"}
             onPress={handleGuardar}
             disabled={loading}
           />
@@ -206,13 +196,14 @@ export default function EditarCitasScreen() {
   );
 }
 
+// Estilos del componente
 const styles = StyleSheet.create({
   keyboardAvoidingContainer: {
     flex: 1,
     backgroundColor: '#E0FFFF', // Aguamarina claro (LightCyan)
   },
   header: {
-    height: '30%', // Altura relativa para el encabezado
+    height: '25%', // Altura relativa para el encabezado
     backgroundColor: '#AFEEEE', // Aguamarina suave (PaleTurquoise) para el desvanecido
     justifyContent: 'center',
     alignItems: 'center',
@@ -284,12 +275,25 @@ const styles = StyleSheet.create({
     backgroundColor: '#dfe6e9', // Subrayado más claro
     marginTop: 5,
   },
-  multilineInput: {
-    minHeight: 100,
-    textAlignVertical: "top",
+  pickerContainer: {
+    backgroundColor: "#f8f8f8",
+    borderWidth: 0, // Eliminar el borde del pickerContainer
+    borderRadius: 0, // Eliminar el radio de borde del pickerContainer
+    overflow: 'hidden', // Asegura que el borde redondeado se aplique
+    borderBottomWidth: 2, // Simular subrayado para el picker
+    borderBottomColor: '#dfe6e9', // Subrayado más claro para el picker
+    marginBottom: 5, // Espacio entre el picker y el subrayado
   },
-  // El BottonComponent debería manejar su propio estilo de botón y texto.
-  // Estos estilos son solo de referencia si BottonComponent no los provee.
+  picker: {
+    height: 50,
+    width: '100%',
+    color: '#2d3436', // Color del texto del picker
+  },
+  buttonContainer: {
+    marginTop: 20,
+  },
+  // El BotonComponent debería manejar su propio estilo de botón y texto.
+  // Estos estilos son solo de referencia si BotonComponent no los provee.
   buttonText: {
     color: 'white',
     fontSize: 16,

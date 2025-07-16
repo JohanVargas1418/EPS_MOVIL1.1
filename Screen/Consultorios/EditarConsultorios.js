@@ -1,34 +1,31 @@
 import React, { useState } from "react";
 import BottonComponent from "../../components/BottonComponent";
-import {ScrollView,View,Text,TextInput,StyleSheet,Alert,KeyboardAvoidingView,Platform,Dimensions,} from "react-native";
+import {ScrollView,View,Text,TextInput,StyleSheet,Alert,ActivityIndicator,Platform,Dimensions,} from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { crearCitas, editarCitas } from "../../Src/Services/CitasService";
+import { crearConsultorios, editarConsultorios } from "../../Src/Services/ConsultorioService";
 
-export default function EditarCitasScreen() {
+// Componente principal EditarConsultorioScreen
+export default function EditarConsultorioScreen() {
   const navigation = useNavigation();  // Hook para la navegación
   const route = useRoute();  // Hook para acceder a los parámetros de la ruta
 
-  const cita = route.params?.cita;  // Obtiene la cita desde los parámetros de la ruta
+  const consultorio = route.params?.consultorio;  // Obtiene el consultorio desde los parámetros de la ruta
 
   // Estados para los campos del formulario
-  const [idPasientes, setIdPasientes] = useState(cita?.idPasientes?.toString() || "");
-  const [idMedicos, setIdMedicos] = useState(cita?.idMedicos?.toString() || "");
-  const [idConsultorios, setIdConsultorios] = useState(cita?.idConsultorios?.toString() || "");
-  const [fecha, setfecha] = useState(cita?.fecha || "");
-  const [hora, setHora] = useState(cita?.hora || "");
-  const [estado, setEstado] = useState(cita?.estado?.toString() || "");
-  const [motivo, setMotivo] = useState(cita?.motivo?.toString() || "");
-  const [observacion, setObservacion] = useState(cita?.observacion?.toString() || "");
-  const [tipo_consulta, setTipo_consulta] = useState(cita?.tipo_consulta?.toString() || "");
+  const [numero, setNumero] = useState(consultorio?.numero?.toString() || "");
+  const [piso, setPiso] = useState(consultorio?.piso?.toString() || "");
+  const [edificio, setEdificio] = useState(consultorio?.edificio?.toString() || "");
+  const [descripcion, setDescripcion] = useState(consultorio?.descripcion?.toString() || "");
+  const [disponible, setDisponible] = useState(consultorio?.disponible?.toString() || "");
   const [loading, setLoading] = useState(false);  // Estado para controlar el loading
 
-  const esEdicion = !!cita;  // Determina si es una edición o una nueva cita
+  const esEdicion = !!consultorio;  // Determina si es una edición o una nueva creación
 
-  // Función para manejar el guardado de la cita
+  // Función para manejar el guardado del consultorio
   const handleGuardar = async () => {
     // Validación de campos obligatorios
-    if (!idPasientes || !idMedicos || !idConsultorios || !fecha || !hora || !estado || !motivo || !observacion || !tipo_consulta) {
-      Alert.alert("Error", "Todos los campos son obligatorios");
+    if (!numero || !piso || !edificio || !descripcion || !disponible) {
+      Alert.alert("Error", "Por favor complete todos los campos.");
       return;
     }
     setLoading(true);  // Activa el loading
@@ -37,30 +34,26 @@ export default function EditarCitasScreen() {
 
       // Llama a la función de editar o crear según corresponda
       if (esEdicion) {
-        result = await editarCitas(cita.id, {
-          idMedicos: parseInt(idMedicos),
-          idPasientes: parseInt(idPasientes),
-          idConsultorios: parseInt(idConsultorios),
-          fecha,
-          hora,
-          estado,
-          motivo,
-          observacion,
-          tipo_consulta
+        result = await editarConsultorios(consultorio.id, {
+          numero: parseInt(numero),
+          piso: parseInt(piso),
+          edificio,
+          descripcion,
+          disponible,
         });
       } else {
-        result = await crearCitas({ idMedicos, idPasientes, idConsultorios, fecha, hora, estado, motivo, observacion, tipo_consulta });
+        result = await crearConsultorios({ numero, piso, edificio, descripcion, disponible });
       }
 
       // Manejo de la respuesta
       if (result.success) {
-        Alert.alert("Éxito", esEdicion ? "Cita actualizada" : "Cita creada");
+        Alert.alert("Éxito", esEdicion ? "Consultorio actualizado" : "Consultorio creado");
         navigation.goBack();  // Regresa a la pantalla anterior
       } else {
-        Alert.alert("Error", result.message || "Error al guardar la cita");
+        Alert.alert("Error", result.message || "Error al guardar el consultorio");
       }
     } catch (error) {
-      Alert.alert("Error", "Error al guardar la cita");
+      Alert.alert("Error", "Error al guardar el consultorio");
     } finally {
       setLoading(false);  // Desactiva el loading
     }
@@ -74,109 +67,64 @@ export default function EditarCitasScreen() {
     >
       {/* Encabezado */}
       <View style={styles.header}>
-        <Text style={styles.logo}>{esEdicion ? "EDITAR CITA" : "NUEVA CITA"}</Text>
-        <Text style={styles.subtitle}>Gestiona los detalles de tu cita</Text>
+        <Text style={styles.logo}>CONSULTORIO</Text> {/* Título principal */}
+        <Text style={styles.subtitle}>
+          {esEdicion ? "Editar detalles del consultorio" : "Crear nuevo consultorio"}
+        </Text> {/* Subtítulo dinámico */}
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.formContainer}>
-          <Text style={styles.formTitle}>{esEdicion ? "Editar Detalles de Cita" : "Crear Nueva Cita"}</Text>
+          <Text style={styles.formTitle}>
+            {esEdicion ? "Formulario de Edición" : "Formulario de Creación"}
+          </Text>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>ID Médico</Text>
+            <Text style={styles.label}>Número de Piso del Edificio</Text>
             <TextInput
               style={styles.input}
-              placeholder="Id del médico"
+              placeholder="Número de Piso"
               placeholderTextColor="#aaa"
+              value={piso}
+              onChangeText={setPiso}
               keyboardType="numeric"
-              value={idMedicos}
-              onChangeText={setIdMedicos}
             />
             <View style={styles.inputUnderline}></View>
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>ID Paciente</Text>
+            <Text style={styles.label}>Número del Consultorio</Text>
             <TextInput
               style={styles.input}
-              placeholder="Id del paciente"
+              placeholder="Número del Consultorio"
               placeholderTextColor="#aaa"
+              value={numero}
+              onChangeText={setNumero}
               keyboardType="numeric"
-              value={idPasientes}
-              onChangeText={setIdPasientes}
             />
             <View style={styles.inputUnderline}></View>
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>ID Consultorio</Text>
+            <Text style={styles.label}>Nombre del Edificio</Text>
             <TextInput
               style={styles.input}
-              placeholder="Id del consultorio"
+              placeholder="Nombre del Edificio"
               placeholderTextColor="#aaa"
-              keyboardType="numeric"
-              value={idConsultorios}
-              onChangeText={setIdConsultorios}
+              value={edificio}
+              onChangeText={setEdificio}
             />
             <View style={styles.inputUnderline}></View>
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Fecha</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="AAAA-MM-DD"
-              placeholderTextColor="#aaa"
-              value={fecha}
-              onChangeText={setfecha}
-            />
-            <View style={styles.inputUnderline}></View>
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Hora</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="HH:MM:SS"
-              placeholderTextColor="#aaa"
-              value={hora}
-              onChangeText={setHora}
-            />
-            <View style={styles.inputUnderline}></View>
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Estado</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Estado de la cita"
-              placeholderTextColor="#aaa"
-              value={estado}
-              onChangeText={setEstado}
-            />
-            <View style={styles.inputUnderline}></View>
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Motivo</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Motivo de la consulta"
-              placeholderTextColor="#aaa"
-              value={motivo}
-              onChangeText={setMotivo}
-            />
-            <View style={styles.inputUnderline}></View>
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Observaciones</Text>
+            <Text style={styles.label}>Descripción del Consultorio</Text>
             <TextInput
               style={[styles.input, styles.multilineInput]}
-              placeholder="Detalles adicionales"
+              placeholder="Descripción del Consultorio"
               placeholderTextColor="#aaa"
-              value={observacion}
-              onChangeText={setObservacion}
+              value={descripcion}
+              onChangeText={setDescripcion}
               multiline
               numberOfLines={4}
             />
@@ -184,19 +132,19 @@ export default function EditarCitasScreen() {
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Tipo de Consulta</Text>
+            <Text style={styles.label}>Consultorio disponible</Text>
             <TextInput
               style={styles.input}
-              placeholder="Tipo de consulta"
+              placeholder="Estado de disponibilidad"
               placeholderTextColor="#aaa"
-              value={tipo_consulta}
-              onChangeText={setTipo_consulta}
+              value={disponible}
+              onChangeText={setDisponible}
             />
             <View style={styles.inputUnderline}></View>
           </View>
 
           <BottonComponent
-            title={loading ? "Guardando..." : "Guardar Cita"}
+            title={loading ? "Guardando..." : "Guardar Consultorio"}
             onPress={handleGuardar}
             disabled={loading}
           />
@@ -206,6 +154,7 @@ export default function EditarCitasScreen() {
   );
 }
 
+// Estilos del componente
 const styles = StyleSheet.create({
   keyboardAvoidingContainer: {
     flex: 1,

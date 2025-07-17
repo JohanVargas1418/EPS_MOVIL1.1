@@ -40,20 +40,20 @@ export default function EditarPasientesScreen() {
         result = await editarPasientes(pasientes.id, {
           nombre,
           apellido,
-          num_documento: parseInt(num_documento),
+          num_documento,
           tipo_documento,
           genero,
-          telefono: parseInt(telefono),
+          telefono,
           correo
         });
       } else {
         result = await crearPasientes({ 
           nombre, 
           apellido, 
-          num_documento: parseInt(num_documento), 
+          num_documento, 
           tipo_documento, 
           genero, 
-          telefono: parseInt(telefono), 
+          telefono, 
           correo 
         });
       }

@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage"; 
-import api from "./conexion"; 
+import api from "./conexion";
 
 // Función para iniciar sesión de un usuario
 export const loginUser  = async (email, password) => {
@@ -72,5 +72,18 @@ export const registroUser  = async (name, email, password, role) => {
                 ? error.response.data.message 
                 : "Error de conexión",
         };
+    }
+};
+
+export const editarPerfil = async (id, data) => {
+    try {
+        const response = await api.put(`/editarUser/${id}`, data);
+        return { success: true, user: response.data.user };
+    } catch (error) {
+        console.error("Error al editar perfil:", error.response ? error.response.data : error.message);
+        const message = error.response?.data?.errors
+            ? Object.values(error.response.data.errors).flat().join('\n')
+            : error.response?.data?.message || "Ocurrió un error al actualizar el perfil.";
+        return { success: false, message };
     }
 };
